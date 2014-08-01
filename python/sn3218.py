@@ -88,6 +88,8 @@ def output(values):
     i2c.write_i2c_block_data(address, CMD_SET_PWM_VALUES, [channel_gamma_table[i][values[i]] for i in range(18)])
     i2c.write_i2c_block_data(address, CMD_UPDATE, [0xFF])
 
+enable_leds(0b111111111111111111)
+
 if __name__ == "__main__":
     print "sn3218 test cycles"
     
