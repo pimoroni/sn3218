@@ -1,0 +1,6 @@
+Change Log
+==========
+
+1.0dev
+-------
+- Initial release
