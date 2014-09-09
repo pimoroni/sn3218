@@ -6,8 +6,12 @@ CMD_ENABLE_LEDS = 0x13
 CMD_UPDATE = 0x16
 CMD_RESET = 0x17
 
+def i2c_bus_id():
+    revision = ([l[12:-1] for l in open('/proc/cpuinfo','r').readlines() if l[:8]=="Revision"]+['0000'])[0]
+    return 1 if int(revision, 16) >= 4 else 0
+
 address = 0x54
-i2c = SMBus(1)
+i2c = SMBus(i2c_bus_id())
 
 # generate a good default gamma table
 default_gamma_table = [int(pow(255, float(i - 1) / 255)) for i in range(256)]
