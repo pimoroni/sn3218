@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+
+1.2.1
+-----
+- Removed hard dependancy upon SMbus, added message at runtime
+
 1.0dev
 -------
 - Initial release
