@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+1.2.3
+-----
+- Print fix
+
 1.2.2
 -----
 - Added i2c_bus_id detection for older Pi

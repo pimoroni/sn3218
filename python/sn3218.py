@@ -98,7 +98,7 @@ def output(values):
 enable_leds(0b111111111111111111)
 
 if __name__ == "__main__":
-    print "sn3218 test cycles"
+    print("sn3218 test cycles")
     
     import time, sys, os, math
 
@@ -109,48 +109,48 @@ if __name__ == "__main__":
     enable()
     enable_leds(0b111111111111111111)
     
-    print ">> test enable mask (on/off)",
+    print(">> test enable mask (on/off)")
     enable_mask = 0b000000000000000000
     output([0x10] * 18)
     for i in range(10):
         enable_mask = ~enable_mask
         enable_leds(enable_mask)
         time.sleep(0.15)
-    print ""
+    print("")
 
-    print ">> test enable mask (odd/even)",
+    print(">> test enable mask (odd/even)")
     enable_mask = 0b101010101010101010
     output([0x10] * 18)
     for i in range(10):
         enable_mask = ~enable_mask
         enable_leds(enable_mask)
         time.sleep(0.15)
-    print ""
+    print("")
 
-    print ">> test enable mask (rotate)",
+    print(">> test enable mask (rotate)")
     enable_mask = 0b100000100000100000
     output([0x10] * 18)
     for i in range(10):
         enable_mask = ((enable_mask & 0x01) << 18) | enable_mask >> 1
         enable_leds(enable_mask)
         time.sleep(0.15)
-    print ""
+    print("")
 
-    print ">> test gamma gradient",
+    print(">> test gamma gradient")
     enable_mask = 0b111111111111111111
     enable_leds(enable_mask)
     for i in range(256):
         output([((j * (256/18)) + (i * (256/18))) % 256 for j in range(18)])
         time.sleep(0.01)
-    print ""
+    print("")
 
-    print ">> test gamma fade",
+    print(">> test gamma fade")
     enable_mask = 0b111111111111111111
     enable_leds(enable_mask)
     for i in range(512):
         output([int((math.sin(float(i)/64.0) + 1.0) * 128.0)]*18)
         time.sleep(0.01)
-    print ""
+    print("")
 
     # turn everything off and disable output
     output([0 for i in range(18)])
