@@ -1,7 +1,12 @@
+import sys
+
 try:
     from smbus import SMBus
 except ImportError:
-    exit("This library requires python-smbus\nInstall with: sudo apt-get install python-smbus")
+    if sys.version_info[0] < 3:
+        exit("This library requires python-smbus\nInstall with: sudo apt-get install python-smbus")
+    elif sys.version_info[0] == 3:
+        exit("This library requires python3-smbus\nInstall with: sudo apt-get install python3-smbus")
 
 CMD_ENABLE_OUTPUT = 0x00
 CMD_SET_PWM_VALUES = 0x01
