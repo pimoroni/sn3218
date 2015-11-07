@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Copyright (c) 2014 Pimoroni
 
@@ -20,7 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 classifiers = ['Development Status :: 5 - Production/Stable',
                'Operating System :: POSIX :: Linux',
@@ -33,7 +37,7 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Topic :: System :: Hardware']
 
 setup(name		= 'sn3218',
-	version		= '1.2.3',
+	version		= '1.2.4',
 	author		= 'Jonathan Williamson',
 	author_email	= 'jon@pimoroni.com',
 	description	= 'A module to drive the sn3218 i2c LED controller',

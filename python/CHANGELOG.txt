@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+1.3.4
+-----
+- Added alternate warning/instructions for missing python3-smbus
+- Code quality improvements
+
 1.2.3
 -----
 - Print fix
