@@ -37,7 +37,7 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Topic :: System :: Hardware']
 
 setup(name		= 'sn3218',
-	version		= '1.2.4',
+	version		= '1.2.5',
 	author		= 'Jonathan Williamson',
 	author_email	= 'jon@pimoroni.com',
 	description	= 'A module to drive the sn3218 i2c LED controller',
