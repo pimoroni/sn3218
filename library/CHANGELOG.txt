@@ -1,23 +1,27 @@
 Change Log
 ==========
 
-1.3.4
------
-- Added alternate warning/instructions for missing python3-smbus
-- Code quality improvements
+1.2.5
+
+* Added LICENSE.txt
+
+1.2.4
+
+* Added alternate warning/instructions for missing python3-smbus
+* Code quality improvements
 
 1.2.3
------
-- Print fix
+
+* Print fix
 
 1.2.2
------
-- Added i2c_bus_id detection for older Pi
+
+* Added i2c_bus_id detection for older Pi
 
 1.2.1
------
-- Removed hard dependancy upon SMbus, added message at runtime
 
-1.0dev
--------
-- Initial release
+* Removed hard dependancy upon SMbus, added message at runtime
+
+1.0.0
+
+* Initial release
