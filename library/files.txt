@@ -1,3 +1,0 @@
-/usr/local/lib/python2.7/dist-packages/sn3218.py
-/usr/local/lib/python2.7/dist-packages/sn3218.pyc
-/usr/local/lib/python2.7/dist-packages/sn3218-1.1dev.egg-info
