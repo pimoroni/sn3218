@@ -1,0 +1,31 @@
+Source: sn3218
+Maintainer: Phil Howard <phil@pimoroni.com>
+Homepage: https://github.com/pimoroni/sn3218
+Section: python
+Priority: optional
+Build-Depends: debhelper (>= 9.0.0), dh-python, python-all (>= 2.7), python-setuptools, python3-all (>= 3.4), python3-setuptools
+Standards-Version: 3.9.6
+X-Python-Version: >= 2.7
+X-Python3-Version: >= 3.4
+
+Package: python-sn3218
+Architecture: all
+Section: python
+Depends: ${misc:Depends}, ${python:Depends}, python-smbus
+Suggests: i2c-tools
+Description: python library to help control the SN3218 18-channel PWM LED driver.
+ The SN3218 is an 18-Channel 8-bit PWM LED Driver.
+ Supports communication over i2c only. 
+ .
+ This is the Python 2 version of the package.
+
+Package: python3-sn3218
+Architecture: all
+Section: python
+Depends: ${misc:Depends}, ${python3:Depends}, python3-smbus
+Suggests: i2c-tools
+Description: python library to help control the SN3218 18-channel PWM LED driver.
+ The SN3218 is an 18-Channel 8-bit PWM LED Driver.
+ Supports communication over i2c only. 
+ .
+ This is the Python 3 version of the package.
