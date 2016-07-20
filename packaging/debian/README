@@ -1,0 +1,9 @@
+README
+
+Python library to help control the SN3218 18-channel PWM LED driver Driver. Supports communication over i2c only. 
+
+IMPORTANT
+
+the sn3218 library requires i2c.
+To enable run `curl get.pimoroni.com/i2c | bash`
+or use raspi-config and reboot your Raspberry Pi.
