@@ -1,4 +1,5 @@
 #!/usr/bin/python
+
 """
 Copyright (c) 2014 Pimoroni
 
@@ -36,15 +37,17 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Topic :: Software Development',
                'Topic :: System :: Hardware']
 
-setup(name		= 'sn3218',
-	version		= '1.2.5',
-	author		= 'Jonathan Williamson',
-	author_email	= 'jon@pimoroni.com',
-	description	= 'A module to drive the sn3218 i2c LED controller',
-	long_description= open('README.md').read() + open('CHANGELOG.txt').read(),
-	license		= 'MIT',
-	keywords	= 'Raspberry Pi sn3218 i2c',
-	url		= 'http://www.pimoroni.com',
-	classifiers     = classifiers,
-	py_modules	= ['sn3218'],
+setup(
+    name            = 'sn3218',
+    version         = '1.2.5',
+    author          = 'Jonathan Williamson',
+    author_email    = 'jon@pimoroni.com',
+    description     = 'A module to drive the sn3218 i2c LED controller',
+    long_description= open('README.txt').read() + open('CHANGELOG.txt').read(),
+    license         = 'MIT',
+    keywords        = 'Raspberry Pi sn3218 i2c',
+    url             = 'http://www.pimoroni.com',
+    classifiers     = classifiers,
+    py_modules      = ['sn3218'],
+    install_requires= []
 )
