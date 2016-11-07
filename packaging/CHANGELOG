@@ -1,3 +1,9 @@
+sn3218 (1.2.6) stable; urgency=low
+
+  * Initial commit to Raspbian apt repository
+
+ -- Phil Howard <phil@pimoroni.com>  Mon, 7 Nov 2016 00:00:00 +0000
+
 sn3218 (1.2.5) UNRELEASED; urgency=low
 
   * Initial commit to Raspbian apt repository
