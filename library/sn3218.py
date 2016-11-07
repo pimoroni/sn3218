@@ -8,6 +8,8 @@ except ImportError:
     elif sys.version_info[0] == 3:
         sys.exit("This library requires python3-smbus\nInstall with: sudo apt-get install python3-smbus")
 
+__version__ = '1.2.6'
+
 I2C_ADDRESS = 0x54
 CMD_ENABLE_OUTPUT = 0x00
 CMD_SET_PWM_VALUES = 0x01
