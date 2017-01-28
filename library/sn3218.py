@@ -118,11 +118,12 @@ if __name__ == "__main__":
     
     import time
     import sys
+    import io
     import os
     import math
 
     # disable output buffering for our test activity dots
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    stream = io.TextIOWrapper(io.open(sys.stdout.fileno(), 'wb', 0), encoding='utf8')
 
     # enable output
     enable()
@@ -159,7 +160,7 @@ if __name__ == "__main__":
     enable_mask = 0b111111111111111111
     enable_leds(enable_mask)
     for i in range(256):
-        output([((j * (256/18)) + (i * (256/18))) % 256 for j in range(18)])
+        output([int(((j * (256/18)) + (i * (256/18))) % 256) for j in range(18)])
         time.sleep(0.01)
     print("")
 
