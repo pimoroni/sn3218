@@ -117,12 +117,7 @@ if __name__ == "__main__":
     print("sn3218 test cycles")
     
     import time
-    import sys
-    import os
     import math
-
-    # disable output buffering for our test activity dots
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w')
 
     # enable output
     enable()
@@ -135,7 +130,6 @@ if __name__ == "__main__":
         enable_mask = ~enable_mask
         enable_leds(enable_mask)
         time.sleep(0.15)
-    print("")
 
     print(">> test enable mask (odd/even)")
     enable_mask = 0b101010101010101010
@@ -144,7 +138,6 @@ if __name__ == "__main__":
         enable_mask = ~enable_mask
         enable_leds(enable_mask)
         time.sleep(0.15)
-    print("")
 
     print(">> test enable mask (rotate)")
     enable_mask = 0b100000100000100000
@@ -153,7 +146,6 @@ if __name__ == "__main__":
         enable_mask = ((enable_mask & 0x01) << 18) | enable_mask >> 1
         enable_leds(enable_mask)
         time.sleep(0.15)
-    print("")
 
     print(">> test gamma gradient")
     enable_mask = 0b111111111111111111
@@ -161,7 +153,6 @@ if __name__ == "__main__":
     for i in range(256):
         output([((j * (256//18)) + (i * (256//18))) % 256 for j in range(18)])
         time.sleep(0.01)
-    print("")
 
     print(">> test gamma fade")
     enable_mask = 0b111111111111111111
@@ -169,7 +160,6 @@ if __name__ == "__main__":
     for i in range(512):
         output([int((math.sin(float(i)/64.0) + 1.0) * 128.0)]*18)
         time.sleep(0.01)
-    print("")
 
     # turn everything off and disable output
     output([0 for i in range(18)])
