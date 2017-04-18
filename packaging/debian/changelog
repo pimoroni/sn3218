@@ -1,3 +1,9 @@
+sn3218 (1.2.7) stable; urgency=low
+
+  * Bugfix: Fix for Python 3.5
+
+ -- Phil Howard <phil@pimoroni.com>  Tue, 18 Apr 2017 00:00:00 +0000
+
 sn3218 (1.2.6) stable; urgency=low
 
   * Initial commit to Raspbian apt repository
