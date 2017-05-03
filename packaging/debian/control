@@ -13,7 +13,7 @@ Architecture: all
 Section: python
 Depends: ${misc:Depends}, ${python:Depends}, python-smbus
 Suggests: i2c-tools
-Description: python library to help control the SN3218 18-channel PWM LED driver.
+Description: Python library for the SN3218 18-channel PWM LED driver.
  The SN3218 is an 18-Channel 8-bit PWM LED Driver.
  Supports communication over i2c only. 
  .
@@ -24,7 +24,7 @@ Architecture: all
 Section: python
 Depends: ${misc:Depends}, ${python3:Depends}, python3-smbus
 Suggests: i2c-tools
-Description: python library to help control the SN3218 18-channel PWM LED driver.
+Description: Python library for the SN3218 18-channel PWM LED driver.
  The SN3218 is an 18-Channel 8-bit PWM LED Driver.
  Supports communication over i2c only. 
  .
