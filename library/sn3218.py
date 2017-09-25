@@ -4,9 +4,9 @@ try:
     from smbus import SMBus
 except ImportError:
     if sys.version_info[0] < 3:
-        sys.exit("This library requires python-smbus\nInstall with: sudo apt-get install python-smbus")
+        raise ImportError("This library requires python-smbus\nInstall with: sudo apt install python-smbus")
     elif sys.version_info[0] == 3:
-        sys.exit("This library requires python3-smbus\nInstall with: sudo apt-get install python3-smbus")
+        raise ImportError("This library requires python3-smbus\nInstall with: sudo apt install python3-smbus")
 
 __version__ = '1.2.7'
 
