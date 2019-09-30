@@ -20,24 +20,24 @@ CMD_ENABLE_LEDS = 0x13
 CMD_UPDATE = 0x16
 CMD_RESET = 0x17
 
-DEFAULT_NAMES = ['ONE',
-                 'TWO',
-                 'THREE',
-                 'FOUR',
-                 'FIVE',
-                 'SIX',
-                 'SEVEN',
-                 'EIGHT',
-                 'NINE',
-                 'TEN',
-                 'ELEVEN',
-                 'TWELVE',
-                 'THIRTEEN',
-                 'FOURTEEN',
-                 'FIFTEEN',
-                 'SIXTEEN',
-                 'SEVENTEEN',
-                 'EIGHTEEN']
+DEFAULT_NAMES = {'ONE': 1,
+                 'TWO': 2,
+                 'THREE': 3,
+                 'FOUR': 4,
+                 'FIVE': 5,
+                 'SIX': 6,
+                 'SEVEN': 7,
+                 'EIGHT': 8,
+                 'NINE': 9,
+                 'TEN': 10,
+                 'ELEVEN': 11,
+                 'TWELVE': 12,
+                 'THIRTEEN': 13,
+                 'FOURTEEN': 14,
+                 'FIFTEEN': 15,
+                 'SIXTEEN': 16,
+                 'SEVENTEEN': 17,
+                 'EIGHTEEN': 18}
 
 
 class SN3218():
@@ -52,6 +52,11 @@ class SN3218():
                 the range 1 - 18. Names must be unique, i.e. each name can only be used
                 for one LED, but multiple names can be used to refer to the same LED.
                 LEDs that are not named can still be controlled by number.
+
+        Raises:
+            ValueError: if led_names is not a dictionary or if one of the numbers in
+                led_names is not in the range 1-18.
+
         """
         led_bits = {'NONE': 0, 'ALL': 0b111111111111111111}
         # Default/backup numerical LED names,
@@ -62,15 +67,15 @@ class SN3218():
             try:
                 for name, number in led_names.items():
                     if number not in range(0, 18):
-                        msg = "LED numbers in led_names must be 0-17, found {}.".format(number)
+                        msg = "LED numbers in led_names must be 1-18, found {}.".format(number)
                         raise ValueError(msg)
                     led_bits[name] = self._led_number_to_int(number)
             except (AttributeError, TypeError):
                 msg = "led_names should be a dictionary, got {}.".format(type(led_names))
                 raise ValueError(msg)
-            self._led_names = list(led_names.keys())
+            self._led_names = led_names
         else:
-            self._led_names = list(led_bits.keys())
+            self._led_names = DEFAULT_NAMES
 
         # enum.Flag to associate names with bitmasks
         self._led_bitmask = Flag('LEDBitmask', led_bits)
@@ -79,8 +84,8 @@ class SN3218():
         self._i2c = SMBus(self._get_i2c_bus_id())
 
         # generate a good default gamma table
-        self._default_gamma_table = [int(pow(255, float(i - 1) / 255)) for i in range(256)]
-        self._channel_gamma_table = [self._default_gamma_table] * 18
+        self._default_gamma_table = [int(255**((i - 1) / 255)) for i in range(256)]
+        self._led_gamma_tables = [self._default_gamma_table] * 18
 
         # Turn off all LEDS but enable output.
         self.turn_off_leds()
@@ -184,6 +189,49 @@ class SN3218():
 
         return {name: bool(self._leds_enabled & self._led_bitmask[name]) for name in names}
 
+    def set_led_gamma(self, led, gamma_table):
+        """Override the gamma table for a single LED.
+
+        Args:
+            led (str or int): LED specifier, can be a string corresponding to a user
+                defined name, one of the default names (e.g. 'EIGHT'), or an integer
+                between 1 and 18.
+            gamma_table (list): list of 256 gamma correction values
+        Raises:
+            ValueError: if led is not a valid LED specifier
+            TypeError: if gamma_table is not a list.
+            ValueError: if gamma_table does not have 256 elements.
+
+        """
+        try:
+            # Try to use led as user defined name.
+            led_number = self._led_names[led]
+        except KeyError:
+            # Try using led as a default name.
+            try:
+                led_number = DEFAULT_NAMES[led]
+            except KeyError:
+                try:
+                    # Try to use led as a led number
+                    led_number = int(led)
+                    if led_number < 1 or led_number > 18:
+                        msg = "LED numbers must be between 1 & 18, got {}".format(led_number)
+                        raise ValueError()
+                except Exception:
+                    raise ValueError("'{}' is not a valid LED name or an integer.".format(led))
+
+        if not isinstance(gamma_table, list):
+            try:
+                gamma_table = list(gamma_table)
+            except Exception:
+                msg = "gamma_table must be a list, got {}.".format(type(gamma_table))
+                raise TypeError(msg)
+
+        if len(gamma_table) != 256:
+            raise ValueError("gamma_table must have 256 elements, got {}.".format(len(gamma_table)))
+
+        self._led_gamma_tables[led_number] = gamma_table
+
 # Private methods
 
     def _get_i2c_bus_id(self):
@@ -199,7 +247,7 @@ class SN3218():
             # Try retrieving bitmask by name.
             led_bitmask = self._led_bitmask['specifier']
         except KeyError:
-            # Retrieving by name didn't work, try retreiving by number.
+            # Retrieving by name didn't work, try retrieving by number.
             try:
                 led_bitmask = self._LEDBitMask(self._led_number_to_int(specifier))
             except ValueError:
