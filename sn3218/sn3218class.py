@@ -20,6 +20,25 @@ CMD_ENABLE_LEDS = 0x13
 CMD_UPDATE = 0x16
 CMD_RESET = 0x17
 
+DEFAULT_NAMES = ['ONE',
+                 'TWO',
+                 'THREE',
+                 'FOUR',
+                 'FIVE',
+                 'SIX',
+                 'SEVEN',
+                 'EIGHT',
+                 'NINE',
+                 'TEN',
+                 'ELEVEN',
+                 'TWELVE',
+                 'THIRTEEN',
+                 'FOURTEEN',
+                 'FIFTEEN',
+                 'SIXTEEN',
+                 'SEVENTEEN',
+                 'EIGHTEEN']
+
 
 class SN3218():
     """Class representing an SN3218 18 channel PWD LED driver."""
@@ -36,24 +55,7 @@ class SN3218():
         """
         led_bits = {'NONE': 0, 'ALL': 0b111111111111111111}
         # Default/backup numerical LED names,
-        for i, name in enumerate(['ONE',
-                                  'TWO',
-                                  'THREE',
-                                  'FOUR',
-                                  'FIVE',
-                                  'SIX',
-                                  'SEVEN',
-                                  'EIGHT',
-                                  'NINE',
-                                  'TEN',
-                                  'ELEVEN',
-                                  'TWELVE',
-                                  'THIRTEEN',
-                                  'FOURTEEN',
-                                  'FIFTEEN',
-                                  'SIXTEEN',
-                                  'SEVENTEEN',
-                                  'EIGHTEEN']):
+        for i, name in enumerate(DEFAULT_NAMES):
             led_bits[name] = self._led_number_to_int(i + 1)
         # Add user defined LED names.
         if led_names:
@@ -71,7 +73,7 @@ class SN3218():
             self._led_names = list(led_bits.keys())
 
         # enum.Flag to associate names with bitmasks
-        self._LEDBitMask = Flag('LEDBitMask', led_bits)
+        self._led_bitmask = Flag('LEDBitmask', led_bits)
 
         # Open I2C connection
         self._i2c = SMBus(self._get_i2c_bus_id())
@@ -93,6 +95,13 @@ class SN3218():
         except AttributeError:
             pass
 
+# Properties
+
+    @property
+    def leds_enabled(self):
+        """Return current status of named LEDS."""
+        return self.get_leds_enabled()
+
 # Public methods
 
     def enable(self):
@@ -108,30 +117,72 @@ class SN3218():
         self._i2c.write_i2c_block_data(I2C_ADDRESS, CMD_RESET, [0xFF])
 
     def turn_off_leds(self, leds=None):
-        """Turn off specified LEDs."""
+        """Turn off specified LEDs.
+
+        Args:
+            leds (list, optional): list of LED specifiers, each one will be turned off.
+                LED specifiers can be either strings corresponding to a user defined
+                name, or one of the default names (e.g. 'EIGHT'), or an integer between
+                1 and 18. If not given all LEDs will be turned off.
+
+        Raises:
+            ValueError: if an element of leds is not a valid LED specifier.
+
+        """
         if not leds:
             # Turn them all off.
-            self._LEDs_enabled = self._LEDBitMask.NONE
+            self._leds_enabled = self._led_bitmask.NONE
         else:
             for led in leds:
                 led_bitmask = self._get_bitmask(led)
                 # Disable bit corresponding to specified LED by ANDing with NOT the bitmask.
-                self._LEDs_enabled & ~led_bitmask
+                self._leds_enabled & ~led_bitmask
 
         self._enable_leds(self._LEDS_enabled.value)
 
     def turn_on_leds(self, leds=None):
-        """Turn on specified LEDs."""
+        """Turn on specified LEDs.
+
+        Args:
+            leds (list, optional): list of LED specifiers, each one will be turned on.
+                LED specifiers can be either strings corresponding to a user defined
+                name, or one of the default names (e.g. 'EIGHT'), or an integer between
+                1 and 18. If not given all LEDs will be turned off.
+
+        Raises:
+            ValueError: if an element of leds is not a valid LED specifier.
+
+        """
         if not leds:
             # Turn them all on.
-            self._LEDs_enabled = self._LEDBitMask.ALL
+            self._leds_enabled = self._led_bitmask.ALL
         else:
             for led in leds:
                 led_bitmask = self._get_bitmask(led)
                 # Enable bit corresponding to specified LED by ORing with the bitmask.
-                self._LEDs_enabled | led_bitmask
+                self._leds_enabled | led_bitmask
 
-        self._enable_leds(self._LEDS_enabled.value)
+        self._enable_leds(self._leds_enabled.value)
+
+    def get_leds_enabled(self, named_only=True):
+        """Return current status of LEDs.
+
+        Args:
+            named_only (bool, optional): If True will only return the status of LEDS with
+                user set names, otherwise will return the status of all the LEDs using
+                their numerical names. Default True.
+
+        Returns:
+            dict: Dictionary of {name: status} pairs where status if True if the named LED is
+                currently enabled and False if not.
+
+        """
+        if named_only:
+            names = self._led_names
+        else:
+            names = DEFAULT_NAMES
+
+        return {name: bool(self._leds_enabled & self._led_bitmask[name]) for name in names}
 
 # Private methods
 
@@ -146,7 +197,7 @@ class SN3218():
     def _get_bitmask(self, specifier):
         try:
             # Try retrieving bitmask by name.
-            led_bitmask = self._LEDBitMask['specifier']
+            led_bitmask = self._led_bitmask['specifier']
         except KeyError:
             # Retrieving by name didn't work, try retreiving by number.
             try:
