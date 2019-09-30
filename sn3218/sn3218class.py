@@ -1,5 +1,7 @@
 """Object orientated interface for SN3218 18 channel PWM LED driver."""
 import sys
+import time
+import math
 from enum import Flag
 
 try:
@@ -274,6 +276,7 @@ class SN3218():
         Raises:
             ValueError: if leds_brightness is not a dictionary or a valid int, or if
                 leds_brightness contains invalid LED specifiers or brightness values.
+
         """
         try:
             # Try to access leds_brightness as a dictionary.
@@ -336,6 +339,56 @@ class SN3218():
         else:
             led_number = self._get_led_number(led)
             self._led_gamma_tables[led_number - 1] = self._default_gamma_table
+
+    def demo(self):
+        """Demo/self test using most LED functions."""
+        print("SN3218 test cycles")
+
+        self.enable()
+        self.turn_on_leds()
+
+        print(">> test enable mask (on/off)")
+        self.set_led_brightness(16)
+        for i in range(5):
+            self.turn_on_leds()
+            time.sleep(0.15)
+            self.turn_off_leds()
+            time.sleep(0.15)
+
+        print(">> test enable mask (odd/even)")
+        odd = {i: bool(i % 2) for i in range(1, 19)}
+        even = {name: not bool(number % 2) for name, number in DEFAULT_NAMES.items()}
+        self.led_brightness = 16
+        for i in range(5):
+            self.set_leds_enabled(odd)
+            time.sleep(0.15)
+            self.leds_enabled = even
+            time.sleep(0.15)
+
+        print(">> test enable mask (rotate)")
+        self.set_leds_brightness(16)
+        for i in range(1, 11):
+            enabled = {name: bool((number + i) % 6) for name, number in DEFAULT_NAMES.itema()}
+            self.set_leds_enabled(enabled)
+            time.sleep(0.15)
+
+        print(">> test gamma gradient")
+        self.turn_on_leds()
+        for i in range(256):
+            led_brightness = {}
+            for name, number in DEFAULT_NAMES.items():
+                led_brightness[name] = (((number - 1) * (256//18)) + (i * (256//18))) % 256
+            self.led_brightness = led_brightness
+            time.sleep(0.01)
+
+        print(">> test gamma fade")
+        self.turn_on_leds()
+        for i in range(512):
+            self.led_brightness = int((math.sin(float(i)/64.0) + 1.0) * 128.0)
+            time.sleep(0.01)
+
+        self.set_led_brigtness(0)
+        self.disable()
 
 # Private methods
 
