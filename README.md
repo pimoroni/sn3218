@@ -1,9 +1,14 @@
 SN3218
 ======
 
-A set of drivers for the SN3218 18-channel PWM LED driver.
+Fork of Pimoroni's set of drivers for the SN3218 18-channel PWM LED driver
+(original here: )
 
 Features:
 
-- Python and Arduino implementations of drivers
+- Object orientated Python implementations of drivers
 - Default gamma correction (overridable per channel)
+
+To install use:
+
+	python setup.py install
