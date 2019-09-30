@@ -189,6 +189,34 @@ class SN3218():
 
         return {name: bool(self._leds_enabled & self._led_bitmask[name]) for name in names}
 
+    def set_leds_enabled(self, leds_enabled):
+        """Turn on or off specified LEDs.
+
+        Args:
+            leds_enabled (dict): dictionary of LED specifiers and boolean values. If the value
+                is True the corresponding LED will be turned on, if the value is False the
+                corresponding LED will be turned off. Any LEDS not in the dictionary will
+                remain in their current state. LED specifiers can be either strings
+                corresponding to a user defined name, or one of the default names (e.g. 'EIGHT'),
+                or an integer between 1 and 18.
+
+        Raises:
+            ValueError: if leds_enabled contains an invalid LED specifier.
+
+        """
+        try:
+            for led, enable in leds_enabled.items():
+                led_bitmask = self.get_bitmask(led)
+                if enable:
+                    self._leds_enabled | led_bitmask
+                else:
+                    self._leds_enabled & ~led_bitmask
+        except (AttributeError, TypeError):
+            msg = "led_enabled must be a dictionary, got {}".format(type(leds_enabled))
+            raise ValueError(msg)
+
+        self._enable_leds(self._leds_enabled.value)
+
     def set_led_gamma(self, led, gamma_table):
         """Override the gamma table for a single LED.
 
