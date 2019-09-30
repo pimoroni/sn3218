@@ -80,7 +80,7 @@ class SN3218():
 
         # generate a good default gamma table
         self._default_gamma_table = [int(pow(255, float(i - 1) / 255)) for i in range(256)]
-        self._channel_gamma_table = [self._default_gamma_table] * 181
+        self._channel_gamma_table = [self._default_gamma_table] * 18
 
         # Turn off all LEDS but enable output.
         self.turn_off_leds()
