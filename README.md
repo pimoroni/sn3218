@@ -2,7 +2,7 @@ SN3218
 ======
 
 Fork of Pimoroni's set of drivers for the SN3218 18-channel PWM LED driver
-(original here: )
+(original here: https://github.com/pimoroni/sn3218)
 
 Features:
 
