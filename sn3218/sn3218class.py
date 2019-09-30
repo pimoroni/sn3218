@@ -167,7 +167,7 @@ class SN3218():
             for led in leds:
                 led_bitmask = self._get_led_bitmask(led)
                 # Disable bit corresponding to specified LED by ANDing with NOT the bitmask.
-                self._leds_enabled & ~led_bitmask
+                self._leds_enabled = self._leds_enabled & ~led_bitmask
 
         self._enable_leds(self._leds_enabled.value)
 
@@ -191,7 +191,7 @@ class SN3218():
             for led in leds:
                 led_bitmask = self._get_led_bitmask(led)
                 # Enable bit corresponding to specified LED by ORing with the bitmask.
-                self._leds_enabled | led_bitmask
+                self._leds_enabled = self._leds_enabled | led_bitmask
 
         self._enable_leds(self._leds_enabled.value)
 
