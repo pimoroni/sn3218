@@ -87,9 +87,11 @@ class SN3218():
         self._default_gamma_table = [int(255**((i - 1) / 255)) for i in range(256)]
         # Reset all LED gamma tables to default.
         self.reset_led_gamma()
-
-        # Turn off all LEDS but enable output.
+        # Turn off all LEDS.
         self.turn_off_leds()
+        # Set brightness to max.
+        self.set_leds_brightness(255)
+        # Enable output (LEDs will remain off)
         self.enable()
 
     def __del__(self):
@@ -107,6 +109,27 @@ class SN3218():
     def leds_enabled(self):
         """Return current status of named LEDS."""
         return self.get_leds_enabled()
+
+    @leds_enabled.setter
+    def leds_enabled(self, leds_enabled):
+        """Turn on or off specified LEDs.
+
+        See set_leds_enabled() method for details.
+        """
+        self.set_leds_enabled(leds_enabled)
+
+    @property
+    def leds_brightness(self):
+        """Return current brightness of named LEDS."""
+        return self.get_leds_brightness()
+
+    @leds_brightness.setter
+    def leds_brightness(self, leds_brightness):
+        """Set brightness of LEDS.
+
+        See set_leds_brightness for details.
+        """
+        self.set_leds_brightness(self, leds_brightness)
 
 # Public methods
 
@@ -202,7 +225,8 @@ class SN3218():
                 or an integer between 1 and 18.
 
         Raises:
-            ValueError: if leds_enabled contains an invalid LED specifier.
+            ValueError: if leds_enabled is not a dictionary or if it contains an invalid LED
+                specifier.
 
         """
         try:
@@ -217,6 +241,52 @@ class SN3218():
             raise ValueError(msg)
 
         self._enable_leds(self._leds_enabled.value)
+
+    def get_leds_brightness(self, named_only=True):
+        """Return current brightness of LEDs.
+
+        Args:
+            named_only (bool, optional): If True will only return the brightness of LEDS with
+                user set names, otherwise will return the brightness of all the LEDs using
+                their numerical names. Default True.
+
+        Returns:
+            dict: Dictionary of {name: brightness} pairs where brightness is an integer value
+                between 0 and 255.
+
+        """
+        if named_only:
+            names = self._led_names
+        else:
+            names = DEFAULT_NAMES
+
+        return {name: self._led_brightness[self._get_led_number(name) - 1] for name in names}
+
+    def set_leds_brightness(self, leds_brightness):
+        """Set brightness of specified LEDs.
+
+        Args: leds_brightness (dict or int): dictionary of LED specifiers and integer brightness
+            values in the range 0 to 256. LED specifiers can be either strings corresponding to a
+            user defined name, or one of the default names (e.g. 'EIGHT'), or an integer between
+            1 and 18. Alternatively leds_brightness can be a single integer value, in which case
+            the brightness of all LEDS will be set to this value.
+
+        Raises:
+            ValueError: if leds_brightness is not a dictionary or a valid int, or if
+                leds_brightness contains invalid LED specifiers or brightness values.
+        """
+        try:
+            # Try to access leds_brightness as a dictionary.
+            for led, brightness in leds_brightness.items():
+                led_number = self._get_led_number(led) - 1
+                brightness = self._check_integer(brightness, 0, 255)
+                self._leds_brightness[led_number] = brightness
+        except (AttributeError, TypeError):
+            # Not a dictionary, try to use it as an int.
+            brightness = self._check_integer(leds_brightness, 0, 255)
+            self._leds_brightness = [brightness] * 18
+
+        self._set_led_brightness(self._leds_brightness)
 
     def set_led_gamma(self, led, gamma_table):
         """Override the gamma table for a single LED.
@@ -245,6 +315,7 @@ class SN3218():
         if len(gamma_table) != 256:
             raise ValueError("gamma_table must have 256 elements, got {}.".format(len(gamma_table)))
 
+        gamma_table = [self._check_integer(gamma, 0, 255) for gamma in gamma_table]
         self._led_gamma_tables[led_number] = gamma_table
 
     def reset_led_gamma(self, led=None):
@@ -287,12 +358,9 @@ class SN3218():
             except KeyError:
                 try:
                     # Try to use led as a led number
-                    led_number = int(specifier)
-                    if led_number < 1 or led_number > 18:
-                        msg = "LED numbers must be between 1 & 18, got {}".format(led_number)
-                        raise ValueError()
+                    led_number = self._check_integer(specifier, 1, 18)
                 except Exception:
-                    msg = "'{}' is not a valid LED name or an integer.".format(specifier)
+                    msg = "'{}' is not a valid LED name or LED number.".format(specifier)
                     raise ValueError(msg)
 
         return led_number
@@ -316,3 +384,21 @@ class SN3218():
                                         (enable_mask >> 6) & 0x3F,
                                         (enable_mask >> 12) & 0X3F])
         self._i2c.write_i2c_block_data(I2C_ADDRESS, CMD_UPDATE, [0xFF])
+
+    def _set_led_brightness(self, leds_brightness):
+        pwm_values = [self._led_gamma_tables[i][leds_brightness[i]] for i in range(18)]
+        self._i2c.write_i2c_block_data(I2C_ADDRESS, CMD_SET_PWM_VALUES, pwm_values)
+        self._i2c.write_i2c_block_data(I2C_ADDRESS, CMD_UPDATE, [0xFF])
+
+    def _check_integer(self, value, lower_limit, upper_limit):
+        try:
+            value = int(value)
+        except (ValueError, TypeError):
+            msg = "Could not convert '{}' to int".format(value)
+            raise ValueError(msg)
+
+        if value < lower_limit or value > upper_limit:
+            msg = "Value must be between {} & {}, got {}.".format(lower_limit, upper_limit, value)
+            raise ValueError(msg)
+
+        return value
