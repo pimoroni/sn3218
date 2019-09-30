@@ -91,8 +91,8 @@ class SN3218():
         self.reset_led_gamma()
         # Turn off all LEDS.
         self.turn_off_leds()
-        # Set brightness to max.
-        self.set_leds_brightness(255)
+        # Set brightness to less than blindingly bright.
+        self.set_leds_brightness(16)
         # Enable output (LEDs will remain off)
         self.enable()
 
@@ -131,7 +131,7 @@ class SN3218():
 
         See set_leds_brightness for details.
         """
-        self.set_leds_brightness(self, leds_brightness)
+        self.set_leds_brightness(leds_brightness)
 
 # Public methods
 
@@ -169,7 +169,7 @@ class SN3218():
                 # Disable bit corresponding to specified LED by ANDing with NOT the bitmask.
                 self._leds_enabled & ~led_bitmask
 
-        self._enable_leds(self._LEDS_enabled.value)
+        self._enable_leds(self._leds_enabled.value)
 
     def turn_on_leds(self, leds=None):
         """Turn on specified LEDs.
@@ -233,11 +233,11 @@ class SN3218():
         """
         try:
             for led, enable in leds_enabled.items():
-                led_bitmask = self.get_led_bitmask(led)
+                led_bitmask = self._get_led_bitmask(led)
                 if enable:
-                    self._leds_enabled | led_bitmask
+                    self._leds_enabled = self._leds_enabled | led_bitmask
                 else:
-                    self._leds_enabled & ~led_bitmask
+                    self._leds_enabled = self._leds_enabled & ~led_bitmask
         except (AttributeError, TypeError):
             msg = "led_enabled must be a dictionary, got {}".format(type(leds_enabled))
             raise ValueError(msg)
@@ -262,7 +262,7 @@ class SN3218():
         else:
             names = DEFAULT_NAMES
 
-        return {name: self._led_brightness[self._get_led_number(name) - 1] for name in names}
+        return {name: self._leds_brightness[self._get_led_number(name) - 1] for name in names}
 
     def set_leds_brightness(self, leds_brightness):
         """Set brightness of specified LEDs.
@@ -348,7 +348,7 @@ class SN3218():
         self.turn_on_leds()
 
         print(">> test enable mask (on/off)")
-        self.set_led_brightness(16)
+        self.set_leds_brightness(16)
         for i in range(5):
             self.turn_on_leds()
             time.sleep(0.15)
@@ -358,7 +358,7 @@ class SN3218():
         print(">> test enable mask (odd/even)")
         odd = {i: bool(i % 2) for i in range(1, 19)}
         even = {name: not bool(number % 2) for name, number in DEFAULT_NAMES.items()}
-        self.led_brightness = 16
+        self.leds_brightness = 16
         for i in range(5):
             self.set_leds_enabled(odd)
             time.sleep(0.15)
@@ -367,27 +367,27 @@ class SN3218():
 
         print(">> test enable mask (rotate)")
         self.set_leds_brightness(16)
-        for i in range(1, 11):
-            enabled = {name: bool((number + i) % 6) for name, number in DEFAULT_NAMES.itema()}
+        for i in range(1, 13):
+            enabled = {name: not bool((number + i) % 6) for name, number in DEFAULT_NAMES.items()}
             self.set_leds_enabled(enabled)
             time.sleep(0.15)
 
         print(">> test gamma gradient")
         self.turn_on_leds()
         for i in range(256):
-            led_brightness = {}
+            leds_brightness = {}
             for name, number in DEFAULT_NAMES.items():
-                led_brightness[name] = (((number - 1) * (256//18)) + (i * (256//18))) % 256
-            self.led_brightness = led_brightness
+                leds_brightness[name] = (((number - 1) * (256//18)) + (i * (256//18))) % 256
+            self.leds_brightness = leds_brightness
             time.sleep(0.01)
 
         print(">> test gamma fade")
         self.turn_on_leds()
         for i in range(512):
-            self.led_brightness = int((math.sin(float(i)/64.0) + 1.0) * 128.0)
+            self.leds_brightness = int((math.sin(float(i)/64.0) + 1.0) * 128.0)
             time.sleep(0.01)
 
-        self.set_led_brigtness(0)
+        self.set_leds_brightness(0)
         self.disable()
 
 # Private methods
@@ -421,11 +421,12 @@ class SN3218():
     def _get_led_bitmask(self, specifier):
         try:
             # Try retrieving bitmask by name.
-            led_bitmask = self._led_bitmask['specifier']
+            led_bitmask = self._led_bitmask[specifier]
         except KeyError:
             # Retrieving by name didn't work, try retrieving by number.
             try:
-                led_bitmask = self._LEDBitMask(self._led_number_to_int(specifier))
+                specifier = self._check_integer(specifier, 1, 18)
+                led_bitmask = self._led_bitmask(self._led_number_to_int(specifier))
             except ValueError:
                 raise ValueError("'{}' is not a valid LED specifier.".format(specifier))
 

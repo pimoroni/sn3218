@@ -43,7 +43,7 @@ setup(
     author          = 'Jonathan Williamson',
     author_email    = 'jon@pimoroni.com',
     description     = 'A module to drive the sn3218 i2c LED controller',
-    long_description= open('README.txt').read() + open('CHANGELOG.txt').read(),
+    long_description= open('README.md').read() + open('CHANGELOG.txt').read(),
     license         = 'MIT',
     keywords        = 'Raspberry Pi sn3218 i2c',
     url             = 'http://www.pimoroni.com',
