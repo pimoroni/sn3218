@@ -68,7 +68,7 @@ class SN3218():
         if led_names:
             try:
                 for name, number in led_names.items():
-                    if number not in range(0, 18):
+                    if number not in range(1, 19):
                         msg = "LED numbers in led_names must be 1-18, found {}.".format(number)
                         raise ValueError(msg)
                     led_bits[name] = self._led_number_to_int(number)

@@ -37,7 +37,7 @@ To use the original interace `import sn3218` and proceed as before. To use the o
 inteface:
 
 ```
-from sn3218.sn3218 import SN3218
+from sn3218.sn3218class import SN3218
 
 leds = SN3218(led_names)
 ```
