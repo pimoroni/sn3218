@@ -91,7 +91,7 @@ def channel_gamma(channel, gamma_table):
 
 def output(values):
     """
-    Outputs a new set of values to the driver
+    Outputs a new set of values to the driver.
 
     Args:
         values (list): channel number
@@ -102,6 +102,23 @@ def output(values):
         raise TypeError("values must be a list of 18 integers")
 
     i2c.write_i2c_block_data(I2C_ADDRESS, CMD_SET_PWM_VALUES, [channel_gamma_table[i][values[i]] for i in range(18)])
+    i2c.write_i2c_block_data(I2C_ADDRESS, CMD_UPDATE, [0xFF])
+
+
+def output_raw(values):
+    """
+    Outputs a new set of values to the driver.
+    Similar to output(), but does not use channel_gamma_table.
+
+    Args:
+        values (list): channel number
+    Raises:
+        TypeError: if values is not a list.
+    """
+    if type(values) is not list or len(values) != 18:
+        raise TypeError("values must be a list of 18 integers")
+
+    i2c.write_i2c_block_data(I2C_ADDRESS, CMD_SET_PWM_VALUES, values)
     i2c.write_i2c_block_data(I2C_ADDRESS, CMD_UPDATE, [0xFF])
 
 
