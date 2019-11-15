@@ -1,13 +1,5 @@
 import sys
 
-try:
-    from smbus import SMBus
-except ImportError:
-    if sys.version_info[0] < 3:
-        raise ImportError("This library requires python-smbus\nInstall with: sudo apt install python-smbus")
-    elif sys.version_info[0] == 3:
-        raise ImportError("This library requires python3-smbus\nInstall with: sudo apt install python3-smbus")
-
 __version__ = '1.2.7'
 
 I2C_ADDRESS = 0x54
@@ -17,6 +9,26 @@ CMD_ENABLE_LEDS = 0x13
 CMD_UPDATE = 0x16
 CMD_RESET = 0x17
 
+if sys.version_info < (3, ):
+    SMBUS = "python-smbus"
+else:
+    SMBUS = "python3-smbus"
+
+# Helper function to avoid exception chaining output in python3.
+# use exec to shield newer syntax from older python
+if sys.version_info < (3, 3):
+    def _raise_from_none(exc):
+        raise exc
+else:
+    exec("def _raise_from_none(exc): raise exc from None")
+
+try:
+    from smbus import SMBus
+except ImportError:
+    err_string = "This library requires %s\n" % SMBUS + \
+        "Install with: sudo apt install %s" % SMBUS
+    import_error = ImportError(err_string)
+    _raise_from_none(import_error)
 
 def i2c_bus_id():
     revision = ([l[12:-1] for l in open('/proc/cpuinfo', 'r').readlines() if l[:8] == "Revision"]+['0000'])[0]
