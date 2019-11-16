@@ -55,7 +55,7 @@ def enable_leds(enable_mask):
     Raises:
         TypeError: if enable_mask is not an integer.
     """
-    if type(enable_mask) is not int:
+    if not isinstance(enable_mask, int):
         raise TypeError("enable_mask must be an integer")
 
     i2c.write_i2c_block_data(I2C_ADDRESS, CMD_ENABLE_LEDS,
@@ -77,13 +77,13 @@ def channel_gamma(channel, gamma_table):
     """
     global channel_gamma_table
 
-    if type(channel) is not int:
+    if not isinstance(channel, int):
         raise TypeError("channel must be an integer")
 
     if channel not in range(18):
         raise ValueError("channel be an integer in the range 0..17")
 
-    if type(gamma_table) is not list or len(gamma_table) != 256:
+    if not isinstance(gamma_table, list) or len(gamma_table) != 256:
         raise TypeError("gamma_table must be a list of 256 integers")
 
     channel_gamma_table[channel] = gamma_table
@@ -96,9 +96,9 @@ def output(values):
     Args:
         values (list): channel number
     Raises:
-        TypeError: if values is not a list.
+        TypeError: if values is not a list of 18 integers.
     """
-    if type(values) is not list or len(values) != 18:
+    if not isinstance(values, list) or len(values) != 18:
         raise TypeError("values must be a list of 18 integers")
 
     i2c.write_i2c_block_data(I2C_ADDRESS, CMD_SET_PWM_VALUES, [channel_gamma_table[i][values[i]] for i in range(18)])
@@ -113,9 +113,10 @@ def output_raw(values):
     Args:
         values (list): channel number
     Raises:
-        TypeError: if values is not a list.
+        TypeError: if values is not a list of 18 integers.
     """
-    if type(values) is not list or len(values) != 18:
+    # SMBus.write_i2c_block_data does the type check, so we don't have to
+    if len(values) != 18:
         raise TypeError("values must be a list of 18 integers")
 
     i2c.write_i2c_block_data(I2C_ADDRESS, CMD_SET_PWM_VALUES, values)
