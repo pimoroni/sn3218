@@ -113,7 +113,7 @@ channel_gamma_table = [default_gamma_table] * 18
 
 enable_leds(0b111111111111111111)
 
-if __name__ == "__main__":
+def test_cycles():
     print("sn3218 test cycles")
     
     import time
@@ -164,3 +164,6 @@ if __name__ == "__main__":
     # turn everything off and disable output
     output([0 for i in range(18)])
     disable()
+
+if __name__ == "__main__":
+    test_cycles()
