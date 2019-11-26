@@ -3,29 +3,34 @@
 Tests for sn3218.py
 """
 
-import builtins
 import sys
 import time
 import unittest
-from unittest.mock import patch
 
-# fool pylint
-sn3218 = None # pylint: disable=invalid-name
+PY3 = sys.version_info >= (3,)
+if PY3:
+    import builtins
+    realimport = builtins.__import__
+
+    from unittest.mock import patch
+
+    # fool pylint
+    sn3218 = None # pylint: disable=invalid-name
+else:
+    import sn3218
+    # use newer spelling
+    unittest.TestCase.assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
 
 # Change this to slow down
 DELAY_SEC = 0.1
 
 SKIPSLOW = False
 
-if sys.version_info < (3,):
-    sys.exit("tests currently require python3")
-
 def delay(sec=DELAY_SEC):
     """Sleep for sec seconds"""
     if sec:
         time.sleep(sec)
 
-realimport = builtins.__import__
 
 def fail_import(name, globals, locals, fromlist, level):
     """Helper function to selectively fail import"""
@@ -38,6 +43,7 @@ def fail_import(name, globals, locals, fromlist, level):
 class ImportTest(unittest.TestCase):
     """Test for import failure, and the actual module import"""
 
+    @unittest.skipUnless(PY3, "requires patch")
     def test_import_fail(self):
         """Module import fails when smbus is unavailable"""
 
@@ -47,9 +53,10 @@ class ImportTest(unittest.TestCase):
                 import sn3218
                 assert sn3218
 
+    @unittest.skipUnless(PY3, "imported elsewhere")
     def test_import_ok(self):
         """Module loads correctly"""
-        # ugly hack: this test must run early, and must not be skipped
+        # ugly hack: this test must run early, and must not be skipped on PY3
 
         # pylint: disable=global-statement,redefined-outer-name
         global sn3218
@@ -62,7 +69,7 @@ class SN3218Test(unittest.TestCase):
         """Reset chip for each test"""
         sn3218.reset()
         sn3218.enable()
-        sn3218.enable_leds(0b111111_111111_111111)
+        sn3218.enable_leds(0b111111111111111111)
 
     def test_i2c_bus_id(self):
         """Detect i2c bus ID"""
@@ -84,13 +91,13 @@ class SN3218Test(unittest.TestCase):
         """Enable different combinations of LEDs"""
         sn3218.output([60] * 18)
         for _ in range(3):
-            sn3218.enable_leds(0b101010_101010_101010)
+            sn3218.enable_leds(0b101010101010101010)
             delay()
-            sn3218.enable_leds(0b010101_010101_010101)
+            sn3218.enable_leds(0b010101010101010101)
             delay()
-            sn3218.enable_leds(0b000000_000000_000000)
+            sn3218.enable_leds(0b000000000000000000)
             delay()
-            sn3218.enable_leds(0b111111_111111_111111)
+            sn3218.enable_leds(0b111111111111111111)
             delay()
 
     def test_enable_leds_non_int(self):
