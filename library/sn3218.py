@@ -136,7 +136,6 @@ See https://github.com/pimoroni/sn3218/wiki/missing-i2c
     warnings.warn(warntxt)
     raise(e)
 
-
 # generate a good default gamma table
 default_gamma_table = [int(pow(255, float(i - 1) / 255)) for i in range(256)]
 channel_gamma_table = [default_gamma_table] * 18
