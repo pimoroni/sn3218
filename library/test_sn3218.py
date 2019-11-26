@@ -146,13 +146,11 @@ class SN3218Test(unittest.TestCase):
                                     'list of 18 integers'):
             sn3218.output([0x60] * 99)
 
-    @unittest.skip("awaiting code merge")
     def test_output_raw(self):
         """Output directly to LEDs"""
         sn3218.output_raw([0x60] * 18)
         delay(1)
 
-    @unittest.skip("awaiting code merge")
     def test_output_raw_wrong_type(self):
         """output fails with wrong type"""
         sn3218.output_raw([0x60] * 18)
@@ -160,7 +158,6 @@ class SN3218Test(unittest.TestCase):
                                     'must be a list'):
             sn3218.output_raw("apple")
 
-    @unittest.skip("awaiting code merge")
     def test_output_raw_wrong_len(self):
         """output fails with wrong length"""
         sn3218.output_raw([0x60] * 18)
