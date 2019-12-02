@@ -8,18 +8,12 @@ import time
 import unittest
 
 PY3 = sys.version_info >= (3,)
-if PY3:
-    import builtins
-    realimport = builtins.__import__
-
-    from unittest.mock import patch
-
-    # fool pylint
-    sn3218 = None # pylint: disable=invalid-name
-else:
-    import sn3218
+if not PY3:
     # use newer spelling
     unittest.TestCase.assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+
+# fool pylint
+sn3218 = None # pylint: disable=invalid-name
 
 # Change this to slow down
 DELAY_SEC = 0.1
@@ -31,36 +25,29 @@ def delay(sec=DELAY_SEC):
     if sec:
         time.sleep(sec)
 
-
-def fail_import(name, globals, locals, fromlist, level):
-    """Helper function to selectively fail import"""
-    # pylint: disable=redefined-builtin
-
-    if name in {'smbus'}:
-        raise ImportError("Mock import error")
-    return realimport(name, globals, locals, fromlist, level)
-
 class ImportTest(unittest.TestCase):
     """Test for import failure, and the actual module import"""
 
-    @unittest.skipUnless(PY3, "requires patch")
     def test_import_fail(self):
         """Module import fails when smbus is unavailable"""
-
         # pylint: disable=redefined-outer-name
-        with patch('builtins.__import__', fail_import):
-            with self.assertRaisesRegex(ImportError, "requires"):
-                import sn3218
-                assert sn3218
 
-    @unittest.skipUnless(PY3, "imported elsewhere")
+        sys.modules['smbus'] = None # "hides" smbus
+        with self.assertRaisesRegex(ImportError, 'requires'):
+            import sn3218
+            self.assertTrue(sn3218)
+        del sys.modules['smbus']
+
+
     def test_import_ok(self):
         """Module loads correctly"""
-        # ugly hack: this test must run early, and must not be skipped on PY3
+        # ugly hack: this test must run early, and must not be skipped
 
         # pylint: disable=global-statement,redefined-outer-name
         global sn3218
         import sn3218
+        self.assertTrue(sn3218)
+
 
 class SN3218Test(unittest.TestCase):
     """Tests of sm3218 functions"""
