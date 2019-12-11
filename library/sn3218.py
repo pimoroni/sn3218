@@ -1,4 +1,5 @@
 import sys
+import warnings
 
 try:
     from smbus import SMBus
@@ -123,7 +124,17 @@ def output_raw(values):
     i2c.write_i2c_block_data(I2C_ADDRESS, CMD_UPDATE, [0xFF])
 
 
-i2c = SMBus(i2c_bus_id())
+try:
+    i2c = SMBus(i2c_bus_id())
+except IOError as e:
+    warntxt="""
+###### ###### ###### ###### ###### ###### ###### ######
+i2c initialization failed - is i2c enabled on this system?
+See https://github.com/pimoroni/sn3218/wiki/missing-i2c
+###### ###### ###### ###### ###### ###### ###### ######
+"""
+    warnings.warn(warntxt)
+    raise(e)
 
 # generate a good default gamma table
 default_gamma_table = [int(pow(255, float(i - 1) / 255)) for i in range(256)]
