@@ -20,7 +20,12 @@ CMD_RESET = 0x17
 
 
 def i2c_bus_id():
-    revision = ([l[12:-1] for l in open('/proc/cpuinfo', 'r').readlines() if l[:8] == "Revision"]+['0000'])[0]
+    """
+    Returns the i2c bus ID.
+    """
+    with open('/proc/cpuinfo') as cpuinfo:
+        revision = [l[12:-1] for l in cpuinfo if l[:8] == "Revision"][0]
+    # https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
     return 1 if int(revision, 16) >= 4 else 0
 
 
@@ -142,7 +147,7 @@ channel_gamma_table = [default_gamma_table] * 18
 
 enable_leds(0b111111111111111111)
 
-if __name__ == "__main__":
+def test_cycles():
     print("sn3218 test cycles")
 
     import time
@@ -193,3 +198,6 @@ if __name__ == "__main__":
     # turn everything off and disable output
     output([0 for i in range(18)])
     disable()
+
+if __name__ == "__main__":
+    test_cycles()
