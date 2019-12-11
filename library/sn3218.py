@@ -25,8 +25,7 @@ else:
 try:
     from smbus import SMBus
 except ImportError:
-    err_string = "This library requires %s\n" % SMBUS + \
-        "Install with: sudo apt install %s" % SMBUS
+    err_string = "This library requires {smbus}\nInstall with: sudo apt install {smbus}".format(smbus=SMBUS)
     import_error = ImportError(err_string)
     _raise_from_none(import_error)
 
