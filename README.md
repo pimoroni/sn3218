@@ -1,3 +1,5 @@
+:warning: Deprecated. See: https://github.com/pimoroni/sn3218-python
+
 SN3218
 ======
 
